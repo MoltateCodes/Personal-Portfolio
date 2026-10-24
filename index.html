@@ -1727,7 +1727,12 @@
               </div>
             </div>
             <div class="contact-card">
-              <form class="form" id="contactForm">
+              <form
+                class="form"
+                id="contactForm"
+                action="https://formspree.io/f/YOUR_FORM_ID"
+                method="POST"
+              >
                 <div class="formrow">
                   <div>
                     <label for="name">Name</label
@@ -1770,7 +1775,7 @@
                     required
                   ></textarea>
                 </div>
-                <button class="btn" type="submit">Prepare email →</button>
+                <button class="btn" type="submit">Send Message →</button>
                 <div class="note" id="formNote">
                   This form opens your email app.
                 </div>
@@ -1960,33 +1965,6 @@
         el.classList.add("reveal");
         el.style.transitionDelay = (i % 3) * 70 + "ms";
         obs.observe(el);
-      });
-
-      /* contact form */
-      $("#contactForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const f = new FormData(e.target),
-          to = "mrinmoyrbo@gmail.com";
-        if (to.includes("mrinmoyrbo@gmail.com")) {
-          $("#formNote").textContent =
-            "Replace the email address in the HTML to enable email composition.";
-          return;
-        }
-        const subject = encodeURIComponent(
-            "Portfolio enquiry — " + f.get("topic"),
-          ),
-          body = encodeURIComponent(
-            "Name: " +
-              f.get("name") +
-              "\nEmail: " +
-              f.get("email") +
-              "\nProject: " +
-              f.get("topic") +
-              "\n\n" +
-              f.get("message"),
-          );
-        location.href =
-          "mailto:" + to + "?subject=" + subject + "&body=" + body;
       });
     </script>
   </body>
