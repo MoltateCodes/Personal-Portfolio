@@ -268,9 +268,112 @@ footer .wrap { display: flex; align-items: center; justify-content: space-betwee
   .navright .pill { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+/* ================= motion, gradients, graphics ================= */
+:root { --blob: .22; --c2: #5ab4ff; --c3: #b57bff; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --blob: .16; --c2: #1e7fd6; --c3: #7a3fd4; } }
+:root[data-theme="light"] { --blob: .16; --c2: #1e7fd6; --c3: #7a3fd4; }
+@property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+html, body { overflow-x: clip; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+@keyframes pop { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+@keyframes bob { 50% { transform: translateX(-50%) translateY(-7px); } }
+@keyframes bob2 { 50% { transform: translateY(-7px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes unspin { from { transform: translate(-50%, -50%) rotate(calc(var(--a) * -1)); } to { transform: translate(-50%, -50%) rotate(calc(var(--a) * -1 - 360deg)); } }
+@keyframes flow { to { background-position: -300% 0; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes angle { to { --ang: 360deg; } }
+
+/* ambient background that drifts with scroll and pointer */
+.bgfx { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.bgfx i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: var(--blob); will-change: transform; }
+.bgfx i:nth-child(1) { width: 46vmax; height: 46vmax; left: -12vmax; top: -12vmax; background: var(--accent); }
+.bgfx i:nth-child(2) { width: 40vmax; height: 40vmax; right: -14vmax; top: 28vh; background: var(--c3); }
+.bgfx i:nth-child(3) { width: 36vmax; height: 36vmax; left: 18vw; bottom: -20vmax; background: var(--c2); }
+#glow { position: absolute; left: 0; top: 0; width: 540px; height: 540px; margin: -270px 0 0 -270px; border-radius: 50%; background: radial-gradient(circle, var(--accent-soft), transparent 65%); opacity: 0; transition: opacity .5s; will-change: transform; }
+#progress { background: linear-gradient(90deg, var(--accent), var(--c2), var(--c3)); }
+.nav .wrap { transition: height .3s; }
+.nav.scrolled .wrap { height: 58px; }
+
+/* hero */
+.hero { position: relative; overflow: clip; }
+.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .55;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 75% at 55% 45%, #000, transparent);
+  mask-image: radial-gradient(ellipse 70% 75% at 55% 45%, #000, transparent);
+}
+#heroCanvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero .wrap { position: relative; z-index: 1; }
+.hero .wrap > div:first-child > * { animation: rise .9s cubic-bezier(.2,.7,.2,1) backwards; animation-delay: calc(var(--k, 0) * 90ms); }
+.hero .wrap > div:first-child > *:nth-child(2) { --k: 1; }
+.hero .wrap > div:first-child > *:nth-child(3) { --k: 2; }
+.hero .wrap > div:first-child > *:nth-child(4) { --k: 3; }
+.hero .wrap > div:first-child > *:nth-child(5) { --k: 4; }
+.hero .wrap > div:first-child > *:nth-child(6) { --k: 5; }
+.badge { background-image: linear-gradient(var(--bg), var(--bg)), conic-gradient(from var(--ang), #6d4cff, #28c3a3, #ff9a3c, #6d4cff); animation: rise .9s cubic-bezier(.2,.7,.2,1) backwards, angle 6s linear infinite; }
+.hero h1 .name { position: relative; display: inline-block; background: linear-gradient(100deg, var(--accent), var(--c2), var(--c3), var(--orange), var(--accent)); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: flow 9s linear infinite; }
+.squig { position: absolute; left: 0; bottom: -.04em; width: 100%; height: .16em; overflow: visible; }
+.squig path { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.5s .9s cubic-bezier(.2,.7,.2,1) forwards; }
+
+/* portrait: tilt, glare, orbit */
+.stage { perspective: 900px; }
+.frame { transition: transform .2s ease-out; transform-style: preserve-3d; }
+.glare { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .3s; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255,255,255,.22), transparent 55%); }
+.stage:hover .glare { opacity: 1; }
+.floatbadge { animation: bob 4.5s ease-in-out infinite; }
+.orbit { --ow: 130%; position: absolute; z-index: 2; pointer-events: none; aspect-ratio: 1; width: var(--ow); left: calc((100% - var(--ow)) / 2); top: 50%; margin-top: calc(var(--ow) / -2); border-radius: 50%; border: 1px dashed var(--line-2); animation: spin 40s linear infinite; }
+.orbit .o { position: absolute; inset: 0; transform: rotate(var(--a)); }
+.orbit .o i { position: absolute; top: 0; left: 50%; font-style: normal; white-space: nowrap; font-family: var(--mono); font-size: 12px; padding: 5px 11px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line-2); color: var(--fg); box-shadow: 0 8px 20px var(--shadow); transform: translate(-50%, -50%) rotate(calc(var(--a) * -1)); animation: unspin 40s linear infinite; }
+
+/* buttons */
+.pill { position: relative; overflow: hidden; transition: border-color .2s, background .2s, transform .25s cubic-bezier(.2,.7,.2,1); }
+.pill.solid::after, .pill:not(.solid)::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); transform: translateX(-120%); }
+.pill:hover::after { transform: translateX(120%); transition: transform .7s; }
+:root[data-theme="light"] .pill::after { background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.5) 50%, transparent 70%); }
+.copybtn { transition: transform .25s cubic-bezier(.2,.7,.2,1), color .2s; }
+
+/* section headings: icon float, word reveal */
+.app-icon { animation: bob2 6s ease-in-out infinite; }
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .14em; margin-bottom: -.14em; }
+.w > span { display: inline-block; }
+.js h2.split .w > span { transform: translateY(115%); }
+.js h2.split.in .w > span { transform: none; transition: transform .9s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i) * 70ms); }
+
+/* scroll reveal (only below-the-fold items are hidden, and JS adds .js) */
+.js .rv { opacity: 0; transform: translateY(32px) scale(.98); transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+.js .rv.left { transform: translateX(-48px); }
+.js .rv.right { transform: translateX(48px); }
+.js .rv.in { opacity: 1; transform: none; }
+.project.pop { animation: pop .5s cubic-bezier(.2,.7,.2,1) backwards; animation-delay: var(--d, 0ms); }
+
+/* card spotlight that follows the pointer */
+.card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s; background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), var(--accent-soft), transparent 60%); }
+.card:hover::after { opacity: 1; }
+.card:hover { border-color: var(--line-2); }
+.service, .project { transform-style: preserve-3d; }
+
+/* project visuals: animated gradient behind the image */
+.vis::before { content: ""; position: absolute; inset: -45%; background: conic-gradient(from 0deg, transparent, var(--accent-soft), transparent 40%, rgba(181,123,255,.2), transparent 70%); animation: spin 16s linear infinite; }
+
+/* skill marquee, driven by scroll */
+.marq { padding-top: 88px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+.marq .row { display: flex; width: max-content; margin-bottom: 14px; will-change: transform; }
+.marq .tag { display: inline-flex; align-items: center; gap: 12px; height: 58px; padding: 0 28px; margin-right: 14px; border-radius: 999px; border: 1px solid var(--line-2); background: linear-gradient(180deg, var(--card-a), var(--card-b)); font-family: var(--serif); font-size: 28px; white-space: nowrap; }
+.marq .tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--accent)); box-shadow: 0 0 12px var(--c, var(--accent)); }
+.marq .row:nth-child(2) .tag { font-family: var(--sans); font-size: 16px; font-weight: 500; color: var(--muted); height: 46px; }
+
+/* footer wordmark */
+.bigmark { font-family: var(--serif); font-size: clamp(88px, 24vw, 340px); line-height: .85; text-align: center; letter-spacing: -.04em; margin-bottom: 40px; padding-top: 12px; user-select: none; background: linear-gradient(180deg, var(--line-2), transparent 88%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+@media (max-width: 640px) { .orbit { --ow: 116%; } .orbit .o i { font-size: 11px; padding: 4px 9px; } .marq { padding-top: 64px; } }
+@media (prefers-reduced-motion: reduce) { .js .rv, .js h2.split .w > span { opacity: 1 !important; transform: none !important; } }
 </style>
 
 <div id="progress"></div>
+<div class="bgfx" aria-hidden="true"><i></i><i></i><i></i><b id="glow"></b></div>
 
 <header class="nav">
   <div class="wrap">
@@ -288,10 +391,11 @@ footer .wrap { display: flex; align-items: center; justify-content: space-betwee
 
 <main>
   <section class="hero" id="home">
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
     <div class="wrap">
       <div>
         <span class="badge"><b></b>Open to projects &amp; collaboration</span>
-        <h1><span>Hi, I'm<br>Mrinmoy.</span></h1>
+        <h1><span class="hi">Hi, I'm</span><br><span class="name">Mrinmoy.<svg class="squig" viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 10 C 30 0, 50 16, 80 8 S 130 2, 160 9 S 220 15, 250 7 S 285 4, 298 9"/></svg></span></h1>
         <div class="roles">I'm a <span class="typed" id="typed"></span><span class="caret"></span></div>
         <p class="lead">Computer Science Engineering student, software developer, AI explorer, and game creator. I build digital products and interactive experiences through code and creativity.</p>
         <div class="cta">
@@ -309,12 +413,22 @@ footer .wrap { display: flex; align-items: center; justify-content: space-betwee
           <div class="frame" id="portraitFrame">
             <img src="Profile01.png" alt="Mrinmoy Rajbongshi" loading="eager">
             <div class="fb">MR</div>
+            <div class="glare"></div>
+          </div>
+          <div class="orbit" aria-hidden="true">
+            <div class="o" style="--a:0deg"><i>Unity</i></div>
+            <div class="o" style="--a:72deg"><i>AI</i></div>
+            <div class="o" style="--a:144deg"><i>Blender</i></div>
+            <div class="o" style="--a:216deg"><i>C#</i></div>
+            <div class="o" style="--a:288deg"><i>Node.js</i></div>
           </div>
           <div class="floatbadge">Available for creative projects ↗</div>
         </div>
       </div>
     </div>
   </section>
+
+  <div class="marq" aria-hidden="true"><div class="row" id="row1"></div><div class="row" id="row2"></div></div>
 
   <section class="sec" id="services">
     <div class="wrap">
@@ -549,6 +663,7 @@ footer .wrap { display: flex; align-items: center; justify-content: space-betwee
 </main>
 
 <footer>
+  <div class="bigmark" aria-hidden="true">moltate.</div>
   <div class="wrap">
     <a class="brand" href="#home">mrinmoy<i>.</i></a>
     <span>Building through code. Creating through imagination.</span>
@@ -652,6 +767,172 @@ $("#contactForm").addEventListener("submit", (e) => {
   a.click();
   $("#formNote").textContent = "If your email app did not open, write to mrinmoyrbo@gmail.com directly.";
 });
+
+/* ================= motion layer ================= */
+(function () {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const root = document.documentElement;
+
+  /* hero particle network (canvas) */
+  const cv = $("#heroCanvas"), hero = $("#home");
+  let readCol = () => {};
+  if (cv && cv.getContext) {
+    const ctx = cv.getContext("2d");
+    let W = 0, H = 0, pts = [], mx = -999, my = -999, col = "61,220,132", vis = true;
+    readCol = () => {
+      const c = getComputedStyle(root).getPropertyValue("--accent").trim();
+      const m = /^#?([0-9a-f]{6})$/i.exec(c);
+      if (m) { const n = parseInt(m[1], 16); col = [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(","); }
+    };
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        if (!reduce) {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > W) p.vx *= -1;
+          if (p.y < 0 || p.y > H) p.vy *= -1;
+          const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
+          if (d > 0 && d < 130) { p.x += (dx / d) * (130 - d) * .02; p.y += (dy / d) * (130 - d) * .02; }
+        }
+        ctx.fillStyle = "rgba(" + col + ",.8)";
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
+        for (let j = i + 1; j < pts.length; j++) {
+          const q = pts[j], d = Math.hypot(p.x - q.x, p.y - q.y);
+          if (d < 120) {
+            ctx.strokeStyle = "rgba(" + col + "," + (1 - d / 120) * .28 + ")";
+            ctx.lineWidth = .7; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+          }
+        }
+        const dm = Math.hypot(p.x - mx, p.y - my);
+        if (dm < 170) {
+          ctx.strokeStyle = "rgba(" + col + "," + (1 - dm / 170) * .6 + ")";
+          ctx.lineWidth = .9; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mx, my); ctx.stroke();
+        }
+      }
+    };
+    const size = () => {
+      const r = hero.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
+      W = r.width; H = r.height; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+      const n = Math.max(28, Math.min(80, Math.round((W * H) / 18000)));
+      pts = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35, r: Math.random() * 1.4 + .6 }));
+      readCol(); if (reduce) draw();
+    };
+    size();
+    let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(size, 150); });
+    hero.addEventListener("pointermove", (e) => { const r = hero.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+    hero.addEventListener("pointerleave", () => { mx = my = -999; });
+    if ("IntersectionObserver" in window) new IntersectionObserver((es) => { vis = es[0].isIntersecting; }).observe(hero);
+    if (!reduce) (function loop() { if (vis) draw(); requestAnimationFrame(loop); })();
+  }
+  $("#theme").addEventListener("click", () => setTimeout(readCol, 0));
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => setTimeout(readCol, 0));
+
+  /* skill marquee rows, built from the existing skills and services */
+  const reps = 4, cols = ["var(--accent)", "var(--c2)", "var(--c3)", "var(--orange)"];
+  const rows = [
+    { el: $("#row1"), items: ["C#", "C++", "Python", "JavaScript", "WPF", "Node.js", "Unity", "Blender", "YOLO / OpenCV"], dir: -1, w: 1 },
+    { el: $("#row2"), items: ["Website Development", "Desktop Software", "Game Development", "AI Integration", "3D & Animation", "Creative Prototyping"], dir: 1, w: 1 }
+  ];
+  rows.forEach((r) => {
+    let h = "";
+    for (let k = 0; k < reps; k++) r.items.forEach((t, i) => { h += '<span class="tag"><i style="--c:' + cols[i % 4] + '"></i>' + t.replace(/&/g, "&amp;") + "</span>"; });
+    r.el.innerHTML = h;
+  });
+  const measure = () => rows.forEach((r) => { r.w = r.el.scrollWidth / reps || 1; });
+  measure(); addEventListener("resize", measure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  /* scroll + pointer driven layer */
+  const blobs = [...$$(".bgfx i")], glow = $("#glow"), portrait = $(".portrait"), heroCopy = $(".hero .wrap > div:first-child"), navEl = $(".nav");
+  let px = innerWidth / 2, py = innerHeight / 2, gx = px, gy = py, moved = false;
+  addEventListener("pointermove", (e) => { if (e.pointerType !== "mouse") return; px = e.clientX; py = e.clientY; if (!moved) { moved = true; glow.style.opacity = 1; } }, { passive: true });
+  addEventListener("scroll", () => navEl.classList.toggle("scrolled", scrollY > 20), { passive: true });
+  function tick(t) {
+    const y = scrollY, mx = px / innerWidth - .5, my = py / innerHeight - .5;
+    blobs[0].style.transform = "translate3d(" + mx * -40 + "px," + (y * .12 + my * -30) + "px,0)";
+    blobs[1].style.transform = "translate3d(" + mx * 50 + "px," + (y * -.1 + my * 30) + "px,0)";
+    blobs[2].style.transform = "translate3d(" + (y * .05 + mx * -30) + "px," + (y * -.18) + "px,0)";
+    gx += (px - gx) * .12; gy += (py - gy) * .12;
+    glow.style.transform = "translate3d(" + gx + "px," + gy + "px,0)";
+    const p = Math.min(1, y / 700);
+    heroCopy.style.transform = "translateY(" + y * .06 + "px)";
+    heroCopy.style.opacity = 1 - p * .85;
+    portrait.style.transform = "translateY(" + y * -.05 + "px)";
+    rows.forEach((r) => {
+      const off = ((t * .035 + y * .4) % r.w);
+      r.el.style.transform = "translate3d(" + (r.dir < 0 ? -off : off - r.w) + "px,0,0)";
+    });
+    requestAnimationFrame(tick);
+  }
+  if (!reduce) requestAnimationFrame(tick);
+
+  /* spotlight, tilt, magnetic buttons */
+  document.addEventListener("pointermove", (e) => {
+    const c = e.target.closest && e.target.closest(".card");
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    c.style.setProperty("--mx", e.clientX - r.left + "px");
+    c.style.setProperty("--my", e.clientY - r.top + "px");
+  }, { passive: true });
+  if (fine && !reduce) {
+    $$(".project,.service").forEach((c) => {
+      c.addEventListener("pointermove", (e) => {
+        const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        c.style.transform = "perspective(900px) rotateY(" + x * 6 + "deg) rotateX(" + -y * 6 + "deg) translateY(-3px)";
+      });
+      c.addEventListener("pointerleave", () => { c.style.transform = ""; });
+    });
+    const fr = $("#portraitFrame");
+    fr.addEventListener("pointermove", (e) => {
+      const r = fr.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      fr.style.transform = "rotateY(" + (x - .5) * 12 + "deg) rotateX(" + (.5 - y) * 12 + "deg)";
+      fr.style.setProperty("--gx", x * 100 + "%"); fr.style.setProperty("--gy", y * 100 + "%");
+    });
+    fr.addEventListener("pointerleave", () => { fr.style.transform = ""; });
+    $$(".cta .pill,.navright .pill,.copybtn").forEach((b) => {
+      b.addEventListener("pointermove", (e) => {
+        const r = b.getBoundingClientRect();
+        b.style.transform = "translate(" + (e.clientX - r.left - r.width / 2) * .22 + "px," + (e.clientY - r.top - r.height / 2) * .35 + "px)";
+      });
+      b.addEventListener("pointerleave", () => { b.style.transform = ""; });
+    });
+  }
+
+  /* filter pop-in */
+  $$(".filter").forEach((b) => b.addEventListener("click", () => setTimeout(() => {
+    let i = 0;
+    $$(".project:not(.hide)").forEach((el) => {
+      el.classList.remove("pop"); void el.offsetWidth;
+      el.style.setProperty("--d", i++ * 70 + "ms"); el.classList.add("pop");
+    });
+  }, 0)));
+
+  /* scroll reveal: only items below the fold are hidden, so the first screen is always complete */
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js");
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      const el = e.target; el.classList.add("in"); io.unobserve(el);
+      if (el.classList.contains("rv")) setTimeout(() => el.classList.remove("rv", "in", "left", "right"), 1200 + (parseInt(el.style.getPropertyValue("--d")) || 0));
+    }), { threshold: .12, rootMargin: "0px 0px -6% 0px" });
+    const below = (el) => el.getBoundingClientRect().top > innerHeight * .92;
+    [".head", ".filters", ".marq", ".service", ".project", ".copy", ".facts", ".tl", ".social", ".cc", ".bigmark"].forEach((sel) => $$(sel).forEach((el, i) => {
+      if (!below(el)) return;
+      el.classList.add("rv");
+      if (sel === ".tl") el.classList.add(i % 2 ? "right" : "left");
+      el.style.setProperty("--d", (i % 3) * 90 + "ms");
+      io.observe(el);
+    }));
+    $$("h2").forEach((h) => {
+      const txt = h.textContent.trim();
+      h.setAttribute("aria-label", txt);
+      h.innerHTML = txt.split(/\s+/).map((w, i) => '<span class="w" aria-hidden="true"><span style="--i:' + i + '">' + w.replace(/&/g, "&amp;") + "</span></span>").join(" ");
+      if (below(h)) { h.classList.add("split"); io.observe(h); }
+    });
+  }
+})();
 </script>
 
 </body></html>
