@@ -1740,7 +1740,6 @@
 
     <main>
       <section class="hero" id="home">
-        <canvas id="heroCanvas" aria-hidden="true"></canvas>
         <div class="wrap">
           <div>
             <span class="badge"
@@ -3266,6 +3265,10 @@
         });
         const pts = new THREE.Points(geo, mat);
         pts.frustumCulled = false;
+
+        // Hide background 3D particle models
+        pts.visible = false;
+
         const pg = new THREE.Group();
         pg.add(pts);
         scene.add(pg);
@@ -3702,31 +3705,14 @@
             B = PAL[Math.min(3, i + 1)];
           U.uC1.value.copy(A[0]).lerp(B[0], ease(clamp(f, 0, 1)));
           U.uC2.value.copy(A[1]).lerp(B[1], ease(clamp(f, 0, 1)));
-          const ro = w[1] * (light ? 0.5 : 0.9);
-          rings.forEach((r, k) => {
-            r.material.opacity = ro;
-            r.visible = ro > 0.01;
-            r.rotation.z += dt * (0.4 + k * 0.3) * still;
+          // Disable 3D orbit rings and energy trails
+          rings.forEach((r) => {
+            r.visible = false;
+            r.material.opacity = 0;
           });
-          tm.opacity = w[1];
-          trails.visible = w[1] > 0.01;
-          if (trails.visible) {
-            for (let c = 0; c < COMETS; c++) {
-              const R = 2.6 + (c % 2) * 0.5,
-                tilt = c % 2 ? 1.75 : 1.25,
-                sp = 0.8 + c * 0.13;
-              for (let j = 0; j < TAIL; j++) {
-                const a = t * sp * still + c * 0.9 - j * 0.035,
-                  o = (c * TAIL + j) * 3;
-                const px = Math.cos(a) * R,
-                  py = Math.sin(a) * R;
-                tp[o] = px;
-                tp[o + 1] = py * Math.cos(tilt);
-                tp[o + 2] = py * Math.sin(tilt);
-              }
-            }
-            tg.attributes.position.needsUpdate = true;
-          }
+
+          trails.visible = false;
+          tm.opacity = 0;
           if (sg) {
             sg.visible = op > 0.01;
             sg.position.copy(pg.position);
