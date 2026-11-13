@@ -3095,7 +3095,7 @@
       import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
       /* ===== Config ===== */
-      const SOLDIER_URL = "assets/models/soldier_full_tactical_gear.glb"; // rig + "Mark_Idle_Pose" clip, loaded via XHR (see loadBuffer)
+      const SOLDIER_URL = "assets/models/cyberpunk_character.glb"; // rig + "Mark_Idle_Pose" clip, loaded via XHR (see loadBuffer)
       const SIZE = { laptop: 5.6, pad: 4.2, soldier: 6.0 };
       const DATA = {
         pts: {
@@ -3728,7 +3728,7 @@
             sg.position.copy(pg.position);
 
             // Move the enlarged soldier slightly downward
-            sg.position.y -= 3.5;
+            sg.position.y -= 13.0;
 
             sg.rotation.set(0, yaw, 0);
             smats.forEach((s) => {
